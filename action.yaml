@@ -1,0 +1,57 @@
+name: "Composite action file for Build"
+description: "Composite Action Template For YKN-157 branch"
+inputs:
+   REGISTRY: 
+      description: "REGISTRY"
+      required: true
+      default: "ldmp-docker-dev.repo.orl.eng.hitachivantara.com"
+   GENERIC_REPO_URL: 
+      description: "GENERIC_REPO_URL"
+      required: true
+      default: "https://repo.orl.eng.hitachivantara.com/artifactory/ldmp-generic-dev/lumada-catalog" 
+   IMAGE_NAME: 
+      description: "IMAGE_NAME"
+      required: true
+      default: ${{ github.repository }}
+   DOCKER_BUILDKIT: 
+      description: "DOCKER_BUILDKIT"
+      required: true
+      default: "1"
+    perform_gradle_build:
+      required: true
+      type: boolean
+      default: false
+    gradle_commands:
+      description: "Cmd to run"  
+      required: true
+    working-directory:
+      description: "Current woring directory"
+      required: true
+      default: "."
+    gradle_image:
+      description: "Docker Image to be used"  
+      required: true
+      default: gradle
+    gradle_tag:
+      description: "Tag of the Docker image to be used. Default tag is latest"  
+      required: true
+      default: 7.5.1-jdk11-alpine
+
+    
+runs:
+  using: "composite"
+  steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Gradle Build
+      if: ${{ inputs.perform_gradle_build == 'true'}}
+      uses: lumada-catalog/gh-composite@gradle
+      with:
+         working-directory: ${{inputs.working-directory}}
+         REGISTRY: ${{ inputs.REGISTRY }}
+         GENERIC_REPO_URL: ${{ inputs.GENERIC_REPO_URL }}  
+         IMAGE_NAME: ${{ inputs.IMAGE_NAME }}  
+         gradle_image: ${{ inputs.gradle_image }}
+         gradle_tag: ${{ inputs.gradle_tag }}
