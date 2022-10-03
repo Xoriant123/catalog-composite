@@ -47,7 +47,7 @@ runs:
 
     - name: Gradle Build
       if: ${{ inputs.perform_gradle_build == 'true'}}
-      uses: lumada-catalog/gh-composite@gradle
+      uses: Xoriant123/catalog-composite@gradle
       with:
          working-directory: ${{inputs.working-directory}}
          REGISTRY: ${{ inputs.REGISTRY }}
