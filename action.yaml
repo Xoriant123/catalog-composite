@@ -1,0 +1,45 @@
+name: "Gradle Build"
+description: "Composite Action Template For YKN-157 branch"
+inputs:
+   REGISTRY: 
+      description: "REGISTRY"
+      required: true
+      default: "ldmp-docker-dev.repo.orl.eng.hitachivantara.com"
+   GENERIC_REPO_URL: 
+      description: "GENERIC_REPO_URL"
+      required: true
+      default: "https://repo.orl.eng.hitachivantara.com/artifactory/ldmp-generic-dev/lumada-catalog" 
+   IMAGE_NAME: 
+      description: "IMAGE_NAME"
+      required: true
+      default: ${{ github.repository }}
+   DOCKER_BUILDKIT: 
+      description: "DOCKER_BUILDKIT"
+      required: true
+      default: "1"
+   gradle_image:
+     description: "Docker Image to be used"  
+     required: true
+     default: gradle
+   gradle_tag:
+     description: "Tag of the Docker image to be used. Default tag is latest"  
+     required: true
+     default: 7.5.1-jdk11-alpine
+
+runs:
+  using: "composite"
+  steps:
+    # - name: Calculate and set env variable
+    #   run: |
+    #     echo "GRADLE_USER_HOME=${RUNNER_TEMP}/gradle" >> $GITHUB_ENV
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+
+    - name: Build The project
+      uses: docker://${{inputs.gradle_image}}:${{inputs.gradle_tag}}
+      with:
+        entrypoint: /usr/local/bin/gradle-entrypoint.sh
+        args:
+          - ./gradlew test --no-daemon --full-stacktrace
+          # - ${{inputs.gradle_commands}}
